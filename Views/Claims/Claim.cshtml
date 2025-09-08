@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Submit Claim";
+}
+<h1> Submit a new Monthly Claim</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form>
+            <div class="form-group mb-3">
+                <label for="month" class="control-label">Month</label>
+                <input id="month" name="month" type="month" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label for="hours" class="control-label">Total Hours</label>
+                <input id="hours" name="hours" type="number" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label for="document" class="control-label">Supporting Document</label>
+                <input id="document" name="document" type="file" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit Claim" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
