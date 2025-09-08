@@ -2,7 +2,7 @@ using System.Diagnostics;
 using ContractMontlyClaimSystemPOE.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ContractMontlyClaimSystemPOE.Controllers
+namespace ContractMonthlyClaimSystem.Controllers
 {
     public class HomeController : Controller
     {
@@ -18,6 +18,12 @@ namespace ContractMontlyClaimSystemPOE.Controllers
             return View();
         }
 
+        public IActionResult Dashboard(string userRole)
+        {
+            ViewBag.UserRole = userRole;
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
@@ -30,3 +36,4 @@ namespace ContractMontlyClaimSystemPOE.Controllers
         }
     }
 }
+
