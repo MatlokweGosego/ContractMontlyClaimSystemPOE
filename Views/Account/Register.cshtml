@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Register";// Sets the title of the page to "Register" which will be displayed in the browser tab
 }
 
 <div class="row justify-content-center">
@@ -28,16 +28,19 @@
             <div class="form-group mb-3">
                 <label for="userRole" class="control-label">Register As</label>
                 <select id="userRole" name="userRole" class="form-select">
-                    
+                    <!-- Dropdown for selecting user role during registration -->
                     <option value="">-- Select Role --</option>
                     <option value="Lecturer">Lecturer (Submit Claims)</option>
                     <option value="Coordinator">Programme Coordinator (Pre-Approve Claims)</option>
                     <option value="Manager">Academic Manager (Approve Claims)</option>
+
+
                 </select>
             </div>
             
         </form>
-        
+        <!-- Link to redirect existing users to the login page -->
+        <!-- Uses asp-controller and asp-action tag helpers to generate the correct URL -->
         <p class="text-center">Already have an account? <a asp-controller="Account" asp-action="Login">Login here</a>.</p>
     </div>
 </div>
