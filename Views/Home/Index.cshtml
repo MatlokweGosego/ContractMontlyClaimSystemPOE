@@ -1,8 +1,14 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome";
 }
+<div class="container text-center mt-5">
+   
+    <h1 class="display-4 mb-4 welcome">Welcome to the Contract Monthly Claim System</h1>
+    <p class="lead mb-5">Streamline your claim submission and approval process.</p>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+    <div class="d-grid gap-2 d-md-block">
+        
+        <a class="btn btn-primary btn-lg me-md-3" asp-controller="Account" asp-action="Register">Register</a>
+        <a class="btn btn-outline-primary btn-lg" asp-controller="Account" asp-action="Login">Login</a>
+    </div>
+</div>>

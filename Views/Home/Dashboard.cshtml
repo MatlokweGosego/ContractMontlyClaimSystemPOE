@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    
+    var userRole = ViewBag.UserRole != null ? ViewBag.UserRole.ToString() : "";
+}
+
+<div class="container">
+    <h1>Dashboard</h1>
+
+   
+    <div class="alert alert-info">
+        <strong>Current Role:</strong> @(string.IsNullOrEmpty(userRole) ? "Not Set (Showing All)" : userRole)
+    </div>
+
+    <p class="lead">Welcome back! Here's an overview of your account.</p>
+    <hr />
+
+    <div class="row">
+      
+        @if (string.IsNullOrEmpty(userRole) || userRole == "Lecturer")
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Submit Claim</h5>
+                        <p class="card-text">Create and submit a new monthly claim for approval.</p>
+                        <a asp-controller="Claims" asp-action="Claim" class="btn btn-primary">New Claim</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        
+        @if (string.IsNullOrEmpty(userRole) || userRole == "Lecturer" || userRole == "Coordinator" || userRole == "Manager")
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Track Claims</h5>
+                        <p class="card-text">View the status of claims.</p>
+                        <a asp-controller="Claims" asp-action="TrackClaim" class="btn btn-outline-primary">View History</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        
+        @if (string.IsNullOrEmpty(userRole) || userRole == "Coordinator")
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Pre-Approvals</h5>
+                        <p class="card-text">Review claims awaiting your pre-approval.</p>
+                        <a asp-controller="Claims" asp-action="PreApprove" class="btn btn-warning">Review</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+       
+        @if (string.IsNullOrEmpty(userRole) || userRole == "Manager")
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Approvals</h5>
+                        <p class="card-text">Review claims awaiting your final approval.</p>
+                        <a asp-controller="Claims" asp-action="Approve" class="btn btn-success">Review</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
