@@ -5,6 +5,7 @@ using Moq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System.Data.SqlClient;
+using Xunit;
 
 
 namespace ContractMontlyClaimSystemPOE.Tests

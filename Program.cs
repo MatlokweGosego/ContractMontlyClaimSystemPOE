@@ -2,7 +2,7 @@ using ContractMontlyClaimSystemPOE.Services;
 using System.Data.SqlClient;
 using System.Diagnostics;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder();
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
