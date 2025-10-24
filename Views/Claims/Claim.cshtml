@@ -1,26 +1,118 @@
-﻿@{
+﻿@model ContractMontlyClaimSystemPOE.Models.Claim
+@{
     ViewData["Title"] = "Submit Claim";
 }
-<h1> Submit a new Monthly Claim</h1>
+
+<h1>Submit a new Monthly Claim</h1>
 <hr />
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
 <div class="row">
-    <div class="col-md-6">
-        <form>
-            <div class="form-group mb-3">
-                <label for="month" class="control-label">Month</label>
-                <input id="month" name="month" type="month" class="form-control" />
+    <div class="col-md-8">
+        <form asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="ModuleName" class="control-label">Module Name</label>
+                        <input asp-for="ModuleName" class="form-control" />
+                        <span asp-validation-for="ModuleName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="FacultyName" class="control-label">Faculty Name</label>
+                        <input asp-for="FacultyName" class="form-control" />
+                        <span asp-validation-for="FacultyName" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group mb-3">
-                <label for="hours" class="control-label">Total Hours</label>
-                <input id="hours" name="hours" type="number" class="form-control" />
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="NumberOfSessions" class="control-label">Number of Sessions</label>
+                        <input asp-for="NumberOfSessions" class="form-control" min="1" />
+                        <span asp-validation-for="NumberOfSessions" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="NumberOfHours" class="control-label">Total Hours</label>
+                        <input asp-for="NumberOfHours" class="form-control" min="1" />
+                        <span asp-validation-for="NumberOfHours" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="AmountOfRate" class="control-label">Hourly Rate (R)</label>
+                        <input asp-for="AmountOfRate" class="form-control" min="1" step="0.01" />
+                        <span asp-validation-for="AmountOfRate" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
+
             <div class="form-group mb-3">
-                <label for="document" class="control-label">Supporting Document</label>
-                <input id="document" name="document" type="file" class="form-control" />
+                <label asp-for="AdditionalNotes" class="control-label">Additional Notes</label>
+                <textarea asp-for="AdditionalNotes" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="AdditionalNotes" class="text-danger"></span>
             </div>
+
+            <div class="form-group mb-3">
+                <label for="supportingDocument" class="control-label">Supporting Document</label>
+                <input type="file" id="supportingDocument" name="supportingDocument" class="form-control"
+                       accept=".pdf,.docx,.xlsx" />
+                <small class="form-text text-muted">
+                    Allowed files: PDF, DOCX, XLSX (Max: 5MB)
+                </small>
+                <div id="fileName" class="mt-2 text-info"></div>
+            </div>
+
             <div class="form-group">
-                <input type="submit" value="Submit Claim" class="btn btn-primary" />
+                <button type="submit" class="btn btn-primary btn-lg">Submit Claim</button>
+                <a asp-action="TrackClaim" class="btn btn-outline-secondary">View My Claims</a>
             </div>
         </form>
     </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-header">
+                <h5>Claim Summary</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Total Amount:</strong> <span id="totalAmount">R0.00</span></p>
+                <p><strong>Status:</strong> <span class="badge bg-warning">Pending</span></p>
+                <p class="small text-muted">Your claim will be reviewed by the Programme Coordinator first, then by the Academic Manager.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Calculate total amount in real-time
+        function calculateTotal() {
+            const hours = parseInt($('#NumberOfHours').val()) || 0;
+            const rate = parseFloat($('#AmountOfRate').val()) || 0;
+            const total = hours * rate;
+            $('#totalAmount').text('R' + total.toFixed(2));
+        }
+
+        $('#NumberOfHours, #AmountOfRate').on('input', calculateTotal);
+
+        // Show selected file name
+        $('#supportingDocument').change(function() {
+            const fileName = $(this).val().split('\\').pop();
+            $('#fileName').text('Selected file: ' + fileName);
+        });
+
+        // Initial calculation
+        calculateTotal();
+    </script>
+}

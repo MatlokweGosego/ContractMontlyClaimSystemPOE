@@ -1,17 +1,18 @@
 ﻿using ContractMontlyClaimSystemPOE.Models;
-using ContractMontlyClaimSystemPOE.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using ContractMontlyClaimSystemPOE.Services;
+using Microsoft.AspNetCore.Http;
+using System.Data.SqlClient;
 
 namespace ContractMontlyClaimSystemPOE.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public AccountController(ApplicationDbContext context)
+        public AccountController(IConfiguration configuration)
         {
-            _context = context;
+            _configuration = configuration;
         }
 
         public IActionResult Login()
@@ -25,7 +26,6 @@ namespace ContractMontlyClaimSystemPOE.Controllers
             try
             {
                 // For demo purposes, we'll create a session with the selected role
-                // In a real application, you would validate against the database
                 if (string.IsNullOrEmpty(role))
                 {
                     ModelState.AddModelError("", "Please select a role");
@@ -36,24 +36,46 @@ namespace ContractMontlyClaimSystemPOE.Controllers
                 HttpContext.Session.SetString("UserRole", role);
                 HttpContext.Session.SetString("UserEmail", email);
 
-                // For demo, create a user if doesn't exist
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-                if (user == null)
+                // For demo, create a user if doesn't exist using RAW SQL
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    user = new User
-                    {
-                        FullNames = "Demo User",
-                        Surname = role,
-                        Email = email,
-                        Role = role,
-                        Password = password,
-                        Date = DateTime.Now
-                    };
-                    _context.Users.Add(user);
-                    await _context.SaveChangesAsync();
-                }
+                    await connection.OpenAsync();
 
-                HttpContext.Session.SetInt32("UserId", user.UserID);
+                    // Check if user exists
+                    var checkQuery = "SELECT userID FROM Users WHERE email = @Email";
+                    using (var checkCommand = new SqlCommand(checkQuery, connection))
+                    {
+                        checkCommand.Parameters.AddWithValue("@Email", email);
+                        var existingUserId = await checkCommand.ExecuteScalarAsync();
+
+                        if (existingUserId == null)
+                        {
+                            // Create new user
+                            var insertQuery = @"
+                                INSERT INTO Users (full_names, surname, email, role, password, date)
+                                OUTPUT INSERTED.userID
+                                VALUES (@FullNames, @Surname, @Email, @Role, @Password, @Date)";
+
+                            using (var insertCommand = new SqlCommand(insertQuery, connection))
+                            {
+                                insertCommand.Parameters.AddWithValue("@FullNames", "Demo User");
+                                insertCommand.Parameters.AddWithValue("@Surname", role);
+                                insertCommand.Parameters.AddWithValue("@Email", email);
+                                insertCommand.Parameters.AddWithValue("@Role", role);
+                                insertCommand.Parameters.AddWithValue("@Password", password);
+                                insertCommand.Parameters.AddWithValue("@Date", DateTime.Now);
+
+                                var newUserId = (int)await insertCommand.ExecuteScalarAsync();
+                                HttpContext.Session.SetInt32("UserId", newUserId);
+                            }
+                        }
+                        else
+                        {
+                            HttpContext.Session.SetInt32("UserId", (int)existingUserId);
+                        }
+                    }
+                }
 
                 return RedirectToAction("Dashboard", "Home", new { userRole = role });
             }
@@ -80,25 +102,35 @@ namespace ContractMontlyClaimSystemPOE.Controllers
                     return View();
                 }
 
-                var user = new User
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    FullNames = $"{firstName} {lastName}",
-                    Surname = lastName,
-                    Email = email,
-                    Password = password, // In real app, hash this
-                    Role = userRole,
-                    Date = DateTime.Now
-                };
+                    await connection.OpenAsync();
 
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
+                    var query = @"
+                        INSERT INTO Users (full_names, surname, email, role, password, date)
+                        OUTPUT INSERTED.userID
+                        VALUES (@FullNames, @Surname, @Email, @Role, @Password, @Date)";
 
-                // Auto login after registration
-                HttpContext.Session.SetString("UserRole", userRole);
-                HttpContext.Session.SetString("UserEmail", email);
-                HttpContext.Session.SetInt32("UserId", user.UserID);
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@FullNames", $"{firstName} {lastName}");
+                        command.Parameters.AddWithValue("@Surname", lastName);
+                        command.Parameters.AddWithValue("@Email", email);
+                        command.Parameters.AddWithValue("@Role", userRole);
+                        command.Parameters.AddWithValue("@Password", password); // In real app, hash this
+                        command.Parameters.AddWithValue("@Date", DateTime.Now);
 
-                return RedirectToAction("Dashboard", "Home", new { userRole = userRole });
+                        var userId = (int)await command.ExecuteScalarAsync();
+
+                        // Auto login after registration
+                        HttpContext.Session.SetString("UserRole", userRole);
+                        HttpContext.Session.SetString("UserEmail", email);
+                        HttpContext.Session.SetInt32("UserId", userId);
+
+                        return RedirectToAction("Dashboard", "Home", new { userRole = userRole });
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -114,4 +146,3 @@ namespace ContractMontlyClaimSystemPOE.Controllers
         }
     }
 }
-//Ill be back in 4hours ngikhatele ngiyafa

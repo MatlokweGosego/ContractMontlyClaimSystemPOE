@@ -1,5 +1,7 @@
 ﻿using ContractMontlyClaimSystemPOE.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using ContractMontlyClaimSystemPOE.Models;
 
 namespace ContractMontlyClaimSystemPOE.Controllers
 {
