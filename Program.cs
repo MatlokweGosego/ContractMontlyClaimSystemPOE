@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using ContractMonthlyClaimSystem.Data;
-using ContractMonthlyClaimSystem.Services;
+using ContractMontlyClaimSystemPOE.Data;
+using ContractMontlyClaimSystemPOE.Services;
 using System.Data.SqlClient;
 using System.Diagnostics;
 
