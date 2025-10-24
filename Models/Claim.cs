@@ -17,7 +17,7 @@ namespace ContractMontlyClaimSystemPOE.Models
         public DateTime CreatingDate { get; set; } = DateTime.Now;
         public int LecturerID { get; set; }
 
-        // Navigation property (optional)
+        // Navigation property 
         public User Lecturer { get; set; }
 
         // Calculated property

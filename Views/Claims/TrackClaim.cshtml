@@ -5,7 +5,7 @@
 
 <h1>Track My Claims</h1>
 <hr />
-
+@*Conditional display, allows the different users to have different interfaces*@
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success">
@@ -36,6 +36,7 @@ else
             </tr>
         </thead>
         <tbody>
+            @* Iteration: Loop through each Claim object in the Model list. *@
             @foreach (var claim in Model)
             {
                 <tr>

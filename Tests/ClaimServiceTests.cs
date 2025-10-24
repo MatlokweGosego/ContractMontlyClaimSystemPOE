@@ -10,28 +10,28 @@ using Xunit;
 
 namespace ContractMontlyClaimSystemPOE.Tests
 {
-    public class ClaimServiceTests
-    {
+    public class ClaimServiceTests // Class containing all unit tests for the ClaimService implementation.
+    {   // Private read-only fields to hold the mock dependencies.
         private readonly Mock<IWebHostEnvironment> _mockEnvironment;
         private readonly Mock<IConfiguration> _mockConfiguration;
         private readonly ClaimService _claimService;
 
-        public ClaimServiceTests()
-        {
+        public ClaimServiceTests() // Constructor: Used to set up the necessary environment and mocks
+        {       // 1. Setup Mock Web Host Environment
             _mockEnvironment = new Mock<IWebHostEnvironment>();
             _mockEnvironment.Setup(m => m.WebRootPath).Returns("wwwroot");
-
+            // 2. Setup Mock Configuration
             _mockConfiguration = new Mock<IConfiguration>();
             _mockConfiguration.Setup(m => m.GetConnectionString("DefaultConnection"))
                 .Returns("Server=(localdb)\\claim_system;Database=claims_database;Integrated Security=true;");
-
+            // 3. Initialize the service with the mock objects.
             _claimService = new ClaimService(_mockEnvironment.Object, _mockConfiguration.Object);
         }
 
         [Fact]
         public void CalculateTotalAmount_ValidHoursAndRate_ReturnsCorrectTotal()
         {
-            // Arrange
+            // Arrange: Setup the input data for the test.
             var claim = new Claim
             {
                 NumberOfHours = 40,
