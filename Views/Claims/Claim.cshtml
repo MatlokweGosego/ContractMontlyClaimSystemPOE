@@ -44,8 +44,10 @@
                 <div class="col-md-4">
                     <div class="form-group mb-3">
                         <label asp-for="NumberOfHours" class="control-label">Total Hours</label>
-                        <input asp-for="NumberOfHours" class="form-control" min="1" />
+                        <input asp-for="NumberOfHours" class="form-control" min="1" max="160"
+                               onchange="validateHours(this.value)" />
                         <span asp-validation-for="NumberOfHours" class="text-danger"></span>
+                        <span id="hoursError" class="text-danger" style="display:none;"></span>
                     </div>
                 </div>
                 <div class="col-md-4">
