@@ -140,5 +140,23 @@ namespace ContractMontlyClaimSystemPOE.Controllers
                 return RedirectToAction("PreApprove");
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveClaim(int claimId)
+        {
+            var userRole = GetCurrentUserRole();
+            var result = await _claimService.ApproveClaimWithValidation(claimId, userRole);
+
+            if (result.success)
+            {
+                TempData["SuccessMessage"] = result.message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.message;
+            }
+
+            return RedirectToAction(userRole == "Manager" ? "ApproveClaim" : "PreApprove");
+        }
     }
 }
