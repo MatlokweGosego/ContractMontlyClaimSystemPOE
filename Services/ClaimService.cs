@@ -7,12 +7,14 @@ namespace ContractMontlyClaimSystemPOE.Services
     {
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly IValidationService _validationService;
         private readonly string _connectionString;
 
-        public ClaimService(IWebHostEnvironment environment, IConfiguration configuration)
+        public ClaimService(IWebHostEnvironment environment, IConfiguration configuration, IValidationService validationService)
         {
             _environment = environment;
             _configuration = configuration;
+            _validationService = validationService;
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
@@ -87,6 +89,23 @@ namespace ContractMontlyClaimSystemPOE.Services
             catch (Exception ex)
             {
                 throw new Exception($"Error submitting claim: {ex.Message}");
+            }
+        }
+
+        public async Task<(bool success, string message)> SubmitClaimWithValidation(Claim claim, IFormFile supportingDocument)
+        {
+            var validationResult = _validationService.ValidateClaim(claim);
+            if (!validationResult.isValid) return (false, validationResult.errorMessage);
+
+            try
+            {
+                // Use your existing submission logic
+                var claimId = await SubmitClaim(claim, supportingDocument);
+                return (true, "Claim submitted successfully!");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error submitting claim: {ex.Message}");
             }
         }
 
@@ -204,6 +223,18 @@ namespace ContractMontlyClaimSystemPOE.Services
             }
         }
 
+        public async Task<(bool success, string message)> ApproveClaimWithValidation(int claimId, string approvedBy)
+        {
+            var claim = await GetClaimById(claimId);
+            if (claim == null) return (false, "Claim not found");
+
+            var validationResult = _validationService.ValidateApproval(claim, approvedBy);
+            if (!validationResult.isValid) return (false, validationResult.errorMessage);
+
+            var success = await ApproveClaim(claimId, approvedBy);
+            return (success, success ? "Claim approved successfully!" : "Failed to approve claim");
+        }
+
         public async Task<bool> RejectClaim(int claimId, string rejectedBy)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -270,13 +301,55 @@ namespace ContractMontlyClaimSystemPOE.Services
 
             return null;
         }
-        public async Task<(bool success, string message)> SubmitClaimWithValidation(Claim claim, IFormFile supportingDocument)
-        {
-            var validationResult = _validationService.ValidateClaim(claim);
-            if (!validationResult.isValid) return (false, validationResult.errorMessage);
 
-            // Continue with existing submission
-            return (true, "Claim submitted successfully");
+        // ADDITIONAL METHOD FOR HR FUNCTIONALITY
+        public async Task<List<Claim>> GetApprovedClaims()
+        {
+            var claims = new List<Claim>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                var query = @"
+                    SELECT c.*, u.full_names as LecturerName 
+                    FROM Claims c 
+                    INNER JOIN Users u ON c.lecturerID = u.userID 
+                    WHERE c.claim_status = 'Approved'
+                    ORDER BY c.creating_date DESC";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var claim = new Claim
+                            {
+                                ClaimID = reader.GetInt32(reader.GetOrdinal("claimID")),
+                                NumberOfSessions = reader.GetInt32(reader.GetOrdinal("number_of_sessions")),
+                                NumberOfHours = reader.GetInt32(reader.GetOrdinal("number_of_hours")),
+                                AmountOfRate = reader.GetDecimal(reader.GetOrdinal("amount_of_rate")),
+                                ModuleName = reader.GetString(reader.GetOrdinal("module_name")),
+                                FacultyName = reader.GetString(reader.GetOrdinal("faculty_name")),
+                                SupportingDocuments = reader.IsDBNull(reader.GetOrdinal("supporting_documents")) ? null : reader.GetString(reader.GetOrdinal("supporting_documents")),
+                                ClaimStatus = reader.GetString(reader.GetOrdinal("claim_status")),
+                                CreatingDate = reader.GetDateTime(reader.GetOrdinal("creating_date")),
+                                LecturerID = reader.GetInt32(reader.GetOrdinal("lecturerID"))
+                            };
+
+                            claim.Lecturer = new User
+                            {
+                                FullNames = reader.GetString(reader.GetOrdinal("LecturerName"))
+                            };
+
+                            claims.Add(claim);
+                        }
+                    }
+                }
+            }
+
+            return claims;
         }
     }
 }

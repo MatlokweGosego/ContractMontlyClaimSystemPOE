@@ -171,5 +171,57 @@ namespace ContractMontlyClaimSystemPOE.Services
 
             Console.WriteLine("Tables 'Users' and 'Claims' verified or created.");
         }
+
+        private void InsertSampleData()
+        {
+            using (var connection = new SqlConnection(connectionStringToDatabase))
+            {
+                connection.Open();
+
+                // Insert sample users if none exist
+                var checkUsersQuery = "SELECT COUNT(*) FROM Users";
+                using (var checkCmd = new SqlCommand(checkUsersQuery, connection))
+                {
+                    var userCount = (int)checkCmd.ExecuteScalar();
+                    if (userCount == 0)
+                    {
+                        var insertUsersQuery = @"
+                            INSERT INTO Users (full_names, surname, email, role, password, date) VALUES
+                            ('Gosego Katleho'Matlokwe', 'GKMatlokwe@university.com', 'Lecturer', 'password', GETDATE()),
+                            ('Amyoli Khumoetsile', 'Molefe', 'AmyoliKMolefe@university.com', 'Coordinator', 'password', GETDATE()),
+                            ('Chulumanco Kgosietsile', 'Tinise', 'chulumanco@university.com', 'Manager', 'password', GETDATE()),
+                            ('Qhamani Barulagani', 'Ngwane', 'ngwane@university.com', 'HR', 'password', GETDATE())";
+
+                        using (var insertCmd = new SqlCommand(insertUsersQuery, connection))
+                        {
+                            insertCmd.ExecuteNonQuery();
+                        }
+                        Console.WriteLine("Sample users inserted successfully!");
+                    }
+                }
+
+                // Insert sample claims if none exist
+                var checkClaimsQuery = "SELECT COUNT(*) FROM Claims";
+                using (var checkCmd = new SqlCommand(checkClaimsQuery, connection))
+                {
+                    var claimCount = (int)checkCmd.ExecuteScalar();
+                    if (claimCount == 0)
+                    {
+                        var insertClaimsQuery = @"
+                            INSERT INTO Claims (number_of_sessions, number_of_hours, amount_of_rate, module_name, faculty_name, claim_status, creating_date, lecturerID) VALUES
+                            (10, 40, 250.00, 'Computer Science 101', 'Faculty of Science', 'Pending', GETDATE(), 1),
+                            (8, 32, 300.00, 'Mathematics 202', 'Faculty of Science', 'Pre-Approved', GETDATE(), 1),
+                            (12, 48, 275.00, 'Business Management', 'Faculty of Commerce', 'Approved', GETDATE(), 1)";
+
+                        using (var insertCmd = new SqlCommand(insertClaimsQuery, connection))
+                        {
+                            insertCmd.ExecuteNonQuery();
+                        }
+                        Console.WriteLine("Sample claims inserted successfully!");
+                    }
+                }
+            }
+        }
     }
+
 }

@@ -1,4 +1,6 @@
-﻿namespace ContractMontlyClaimSystemPOE.Services
+﻿using ContractMontlyClaimSystemPOE.Models;
+
+namespace ContractMontlyClaimSystemPOE.Services
 {
     public class ValidationService : IValidationService
     {
@@ -30,7 +32,5 @@
             // Manager can approve anything
             return (true, "Approval criteria met");
         }
-
     }
-
 }
