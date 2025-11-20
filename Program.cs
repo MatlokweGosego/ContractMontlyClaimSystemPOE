@@ -2,12 +2,23 @@ using ContractMontlyClaimSystemPOE.Services;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using FluentValidation.AspNetCore;
+using ContractMontlyClaimSystemPOE.Validators;
+
 // the entry point of the application
-var builder = WebApplication.CreateBuilder();
+var builder = WebApplication.CreateBuilder(args);
 
 // --- 1. Service Registration (Dependency Injection Container) ---
 // Add essential framework services for MVC architecture.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddFluentValidation(fv =>
+{
+    fv.RegisterValidatorsFromAssemblyContaining<ClaimValidator>();
+    fv.AutomaticValidationEnabled = true;
+    fv.ImplicitlyValidateChildProperties = true;
+});
+
 
 // Add session support (used for storing temporary user data like login status 
 builder.Services.AddSession(options =>
@@ -56,3 +67,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 // Starts the application, listening for incoming HTTP requests.
 app.Run();
+
+
