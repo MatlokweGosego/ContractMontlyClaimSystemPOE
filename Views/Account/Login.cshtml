@@ -1,9 +1,9 @@
 ﻿@{
-    ViewData["Title"] = "Login";// Sets the title of the page to "Login" which will be displayed in the browser tab
+    ViewData["Title"] = "Login";
 }
 <div class="row justify-content-center">
     <div class="col-md-4">
-        <h1 class="text-center">Login</h1> <!-- Main heading for the login page -->
+        <h1 class="text-center">Login</h1>
         <form asp-action="Login" method="post">
             <div class="form-group mb-3">
                 <label for="email" class="control-label">Email</label>
@@ -17,13 +17,13 @@
                 <input type="submit" value="Login" class="btn btn-primary w-100" />
             </div>
             <div class="form-group mb-3">
-
                 <label for="role" class="control-label">Role (For Demo)</label>
                 <select id="role" name="role" class="form-select">
-                    <option value="">-- Select Role --</option> <!-- Dropdown for selecting user role - 'name' attribute matches Login parameter -->
+                    <option value="">-- Select Role --</option>
                     <option value="Lecturer">Lecturer</option>
                     <option value="Coordinator">Programme Coordinator</option>
                     <option value="Manager">Academic Manager</option>
+                    <option value="HR">HR Manager</option>
                 </select>
             </div>
         </form>
