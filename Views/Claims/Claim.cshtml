@@ -96,23 +96,53 @@
 
 @section Scripts {
     <script>
-        // Calculate total amount in real-time
+        // Enhanced real-time calculation with validation
         function calculateTotal() {
             const hours = parseInt($('#NumberOfHours').val()) || 0;
             const rate = parseFloat($('#AmountOfRate').val()) || 0;
+            const sessions = parseInt($('#NumberOfSessions').val()) || 0;
             const total = hours * rate;
+
             $('#totalAmount').text('R' + total.toFixed(2));
+
+            // Auto-validation
+            validateHours(hours);
+            validateRate(rate);
+            validateSessions(sessions);
+            validateTotalAmount(total);
         }
 
-        $('#NumberOfHours, #AmountOfRate').on('input', calculateTotal);
+        function validateHours(hours) {
+            const errorElem = $('#hoursError');
+            if (hours > 160) {
+                errorElem.text('Maximum 160 hours per month allowed').show();
+                return false;
+            } else if (hours < 1) {
+                errorElem.text('Minimum 1 hour required').show();
+                return false;
+            } else {
+                errorElem.hide();
+                return true;
+            }
+        }
 
-        // Show selected file name
-        $('#supportingDocument').change(function() {
-            const fileName = $(this).val().split('\\').pop();
-            $('#fileName').text('Selected file: ' + fileName);
-        });
+        function validateRate(rate) {
+            const errorElem = $('#rateError');
+            if (rate > 1000) {
+                errorElem.text('Maximum rate: R1000 per hour').show();
+                return false;
+            } else if (rate < 50) {
+                errorElem.text('Minimum rate: R50 per hour').show();
+                return false;
+            } else {
+                errorElem.hide();
+                return true;
+            }
+        }
 
-        // Initial calculation
+        // Add these error spans to your form
+        $('#NumberOfHours, #AmountOfRate, #NumberOfSessions').on('input', calculateTotal);
         calculateTotal();
     </script>
+    
 }
