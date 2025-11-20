@@ -37,8 +37,10 @@
                 <div class="col-md-4">
                     <div class="form-group mb-3">
                         <label asp-for="NumberOfSessions" class="control-label">Number of Sessions</label>
-                        <input asp-for="NumberOfSessions" class="form-control" min="1" />
+                        <input asp-for="NumberOfSessions" class="form-control" min="1"
+                               onchange="validateSessions(this.value)" />
                         <span asp-validation-for="NumberOfSessions" class="text-danger"></span>
+                        <span id="sessionsError" class="text-danger" style="display:none;"></span>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -53,8 +55,10 @@
                 <div class="col-md-4">
                     <div class="form-group mb-3">
                         <label asp-for="AmountOfRate" class="control-label">Hourly Rate (R)</label>
-                        <input asp-for="AmountOfRate" class="form-control" min="1" step="0.01" />
+                        <input asp-for="AmountOfRate" class="form-control" min="1" step="0.01"
+                               onchange="validateRate(this.value)" />
                         <span asp-validation-for="AmountOfRate" class="text-danger"></span>
+                        <span id="rateError" class="text-danger" style="display:none;"></span>
                     </div>
                 </div>
             </div>
@@ -76,7 +80,7 @@
             </div>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-lg">Submit Claim</button>
+                <button type="submit" class="btn btn-primary btn-lg" onclick="return validateForm()">Submit Claim</button>
                 <a asp-action="TrackClaim" class="btn btn-outline-secondary">View My Claims</a>
             </div>
         </form>
@@ -89,6 +93,9 @@
             </div>
             <div class="card-body">
                 <p><strong>Total Amount:</strong> <span id="totalAmount">R0.00</span></p>
+                <p><strong>Sessions:</strong> <span id="sessionCount">0</span></p>
+                <p><strong>Hours:</strong> <span id="hourCount">0</span></p>
+                <p><strong>Rate:</strong> R<span id="rateDisplay">0.00</span>/hour</p>
                 <p><strong>Status:</strong> <span class="badge bg-warning">Pending</span></p>
                 <p class="small text-muted">Your claim will be reviewed by the Programme Coordinator first, then by the Academic Manager.</p>
             </div>
@@ -106,6 +113,9 @@
             const total = hours * rate;
 
             $('#totalAmount').text('R' + total.toFixed(2));
+            $('#sessionCount').text(sessions);
+            $('#hourCount').text(hours);
+            $('#rateDisplay').text(rate.toFixed(2));
 
             // Auto-validation
             validateHours(hours);
@@ -142,9 +152,60 @@
             }
         }
 
-        // Add these error spans to your form
+        function validateSessions(sessions) {
+            const errorElem = $('#sessionsError');
+            if (sessions > 50) {
+                errorElem.text('Maximum 50 sessions per month allowed').show();
+                return false;
+            } else if (sessions < 1) {
+                errorElem.text('Minimum 1 session required').show();
+                return false;
+            } else {
+                errorElem.hide();
+                return true;
+            }
+        }
+
+        function validateTotalAmount(total) {
+            if (total > 50000) {
+                $('#totalAmount').addClass('text-danger');
+                return false;
+            } else {
+                $('#totalAmount').removeClass('text-danger');
+                return true;
+            }
+        }
+
+        function validateForm() {
+            const hours = parseInt($('#NumberOfHours').val()) || 0;
+            const rate = parseFloat($('#AmountOfRate').val()) || 0;
+            const sessions = parseInt($('#NumberOfSessions').val()) || 0;
+            const moduleName = $('#ModuleName').val();
+            const facultyName = $('#FacultyName').val();
+
+            if (!validateHours(hours) || !validateRate(rate) || !validateSessions(sessions)) {
+                alert('Please fix validation errors before submitting.');
+                return false;
+            }
+
+            if (!moduleName || !facultyName) {
+                alert('Module name and faculty name are required.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Show selected file name
+        $('#supportingDocument').change(function() {
+            const fileName = $(this).val().split('\\').pop();
+            $('#fileName').text('Selected file: ' + fileName);
+        });
+
+        // Event listeners for real-time validation
         $('#NumberOfHours, #AmountOfRate, #NumberOfSessions').on('input', calculateTotal);
+
+        // Initial calculation
         calculateTotal();
     </script>
-    
-}
+    }
