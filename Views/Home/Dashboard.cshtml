@@ -89,5 +89,19 @@
                 </div>
             </div>
         }
+
+        @if (string.IsNullOrEmpty(userRole) || userRole == "HR")
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">HR Management</h5>
+                        <p class="card-text">Manage lecturers and process payments.</p>
+                        <a asp-controller="HR" asp-action="Dashboard" class="btn btn-info">Manage</a>
+                    </div>
+                </div>
+            </div>
+        }
+
     </div>
 </div>
