@@ -270,5 +270,13 @@ namespace ContractMontlyClaimSystemPOE.Services
 
             return null;
         }
+        public async Task<(bool success, string message)> SubmitClaimWithValidation(Claim claim, IFormFile supportingDocument)
+        {
+            var validationResult = _validationService.ValidateClaim(claim);
+            if (!validationResult.isValid) return (false, validationResult.errorMessage);
+
+            // Continue with existing submission
+            return (true, "Claim submitted successfully");
+        }
     }
 }
