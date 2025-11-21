@@ -1,0 +1,109 @@
+﻿@{
+    ViewData["Title"] = "HR Dashboard";
+}
+
+<div class="container">
+    <h1>HR Management Dashboard</h1>
+    <div class="alert alert-info">
+        <strong>Role:</strong> HR Manager - Payment Processing & Lecturer Management
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Approved Claims</h5>
+                            <h2>@ViewBag.ApprovedCount</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                    <a asp-action="ApprovedClaims" class="btn btn-light btn-sm mt-2">View All</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Total Lecturers</h5>
+                            <h2>@ViewBag.LecturerCount</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                    <a asp-action="ManageLecturers" class="btn btn-light btn-sm mt-2">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Pending Payments</h5>
+                            <h2>@ViewBag.PendingPaymentCount</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                    <a asp-action="ApprovedClaims" class="btn btn-light btn-sm mt-2">Process</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">This Month</h5>
+                            <h2>R@(ViewBag.MonthlyTotal?.ToString("N2") ?? "0.00")</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-bar fa-2x"></i>
+                        </div>
+                    </div>
+                    <a asp-action="ApprovedClaims" class="btn btn-light btn-sm mt-2">Reports</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="ApprovedClaims" class="btn btn-primary btn-lg">Process Payments</a>
+                        <a asp-action="ManageLecturers" class="btn btn-outline-primary btn-lg">Manage Lecturers</a>
+                        <a asp-action="GenerateReport" class="btn btn-outline-success btn-lg">Generate Reports</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">No recent activity to display.</p>
+                    <small class="text-muted">Payment processing and management activities will appear here.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

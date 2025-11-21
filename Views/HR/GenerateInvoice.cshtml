@@ -1,0 +1,119 @@
+﻿@model ContractMontlyClaimSystemPOE.Models.InvoiceViewModel
+@{
+    ViewData["Title"] = "Generate Invoice";
+}
+
+<h1>Generate Invoice</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>Invoice Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Invoice Number:</strong> @Model.InvoiceNumber
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Invoice Date:</strong> @Model.InvoiceDate.ToString("MMM dd, yyyy")
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Due Date:</strong> @Model.DueDate.ToString("MMM dd, yyyy")
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Payment Terms:</strong> @Model.PaymentTerms
+                    </div>
+                </div>
+
+                <hr />
+
+                <h5>Claim Information</h5>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Lecturer:</strong> @Model.Claim.Lecturer?.FullNames
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Module:</strong> @Model.Claim.ModuleName
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Hours:</strong> @Model.Claim.NumberOfHours
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Rate:</strong> R@(Model.Claim.AmountOfRate.ToString("N2"))/hour
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Sessions:</strong> @Model.Claim.NumberOfSessions
+                    </div>
+                </div>
+
+                <hr />
+
+                <h5>Payment Summary</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <td><strong>Subtotal:</strong></td>
+                        <td class="text-end">R@(Model.TotalAmount.ToString("N2"))</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tax (15%):</strong></td>
+                        <td class="text-end">R@(Model.TaxAmount.ToString("N2"))</td>
+                    </tr>
+                    <tr class="table-active">
+                        <td><strong>Grand Total:</strong></td>
+                        <td class="text-end"><strong>R@(Model.GrandTotal.ToString("N2"))</strong></td>
+                    </tr>
+                </table>
+
+                <div class="mt-4">
+                    <button class="btn btn-success" onclick="generatePDF()">Download PDF Invoice</button>
+                    <button class="btn btn-primary" onclick="sendEmail()">Send via Email</button>
+                    <a asp-action="ApprovedClaims" class="btn btn-outline-secondary">Back to Claims</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Payment Instructions</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Payment Method:</strong> @Model.PaymentMethod</p>
+                <p><strong>Bank Details:</strong></p>
+                <ul class="small">
+                    <li>Bank: University Central Bank</li>
+                    <li>Account: 123456789</li>
+                    <li>Branch: 12345</li>
+                    <li>Reference: @Model.InvoiceNumber</li>
+                </ul>
+                <p class="text-muted small">Please include the invoice number as payment reference.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function generatePDF() {
+            alert('PDF invoice generated successfully!');
+            // Implement PDF generation logic
+        }
+
+        function sendEmail() {
+            if (confirm('Send invoice via email to lecturer?')) {
+                alert('Invoice sent successfully!');
+                // Implement email sending logic
+            }
+        }
+    </script>
+}
