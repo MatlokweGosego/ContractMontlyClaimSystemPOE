@@ -10,7 +10,6 @@ namespace ContractMontlyClaimSystemPOE.Models
         [Range(1, 50, ErrorMessage = "Sessions must be between 1 and 50")]
         public int NumberOfSessions { get; set; }
 
-
         [Range(1, 160, ErrorMessage = "Hours must be between 1 and 160")]
         public int NumberOfHours { get; set; }
 
@@ -20,7 +19,11 @@ namespace ContractMontlyClaimSystemPOE.Models
         [Required(ErrorMessage = "Module name is required")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Module name must be 2-100 characters")]
         public string ModuleName { get; set; }
+
+        [Required(ErrorMessage = "Faculty name is required")] // ADD THIS
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Faculty name must be 2-100 characters")] // ADD THIS
         public string FacultyName { get; set; }
+
         public string SupportingDocuments { get; set; }
         public string ClaimStatus { get; set; } = "Pending";
         public string AdditionalNotes { get; set; }
@@ -32,7 +35,5 @@ namespace ContractMontlyClaimSystemPOE.Models
 
         // Calculated property
         public decimal TotalAmount => NumberOfHours * AmountOfRate;
-
     }
-
 }
