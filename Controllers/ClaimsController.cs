@@ -8,10 +8,13 @@ namespace ContractMontlyClaimSystemPOE.Controllers
     public class ClaimsController : Controller
     {
         private readonly IClaimService _claimService;
+        private readonly IValidationService _validationService; // ADD THIS
 
-        public ClaimsController(IClaimService claimService)
+        // UPDATE CONSTRUCTOR
+        public ClaimsController(IClaimService claimService, IValidationService validationService)
         {
             _claimService = claimService;
+            _validationService = validationService;
         }
 
         private int? GetCurrentUserId()
@@ -41,10 +44,20 @@ namespace ContractMontlyClaimSystemPOE.Controllers
                 }
 
                 claim.LecturerID = userId.Value;
-                var claimId = await _claimService.SubmitClaim(claim, supportingDocument);
 
-                TempData["SuccessMessage"] = "Claim submitted successfully!";
-                return RedirectToAction("TrackClaim");
+                // USE VALIDATION METHOD FOR AUTOMATION
+                var result = await _claimService.SubmitClaimWithValidation(claim, supportingDocument);
+
+                if (result.success)
+                {
+                    TempData["SuccessMessage"] = result.message;
+                    return RedirectToAction("TrackClaim");
+                }
+                else
+                {
+                    ModelState.AddModelError("", result.message);
+                    return View("Claim", claim);
+                }
             }
             catch (Exception ex)
             {
@@ -89,21 +102,22 @@ namespace ContractMontlyClaimSystemPOE.Controllers
             return View(pendingClaims);
         }
 
+        // REMOVE DUPLICATE METHOD - KEEP THIS ONE WITH VALIDATION
         [HttpPost]
         public async Task<IActionResult> ApproveClaim(int claimId)
         {
             try
             {
                 var userRole = GetCurrentUserRole();
-                var success = await _claimService.ApproveClaim(claimId, userRole);
+                var result = await _claimService.ApproveClaimWithValidation(claimId, userRole);
 
-                if (success)
+                if (result.success)
                 {
-                    TempData["SuccessMessage"] = "Claim approved successfully!";
+                    TempData["SuccessMessage"] = result.message;
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Failed to approve claim.";
+                    TempData["ErrorMessage"] = result.message;
                 }
 
                 return RedirectToAction(userRole == "Manager" ? "ApproveClaim" : "PreApprove");
@@ -139,24 +153,6 @@ namespace ContractMontlyClaimSystemPOE.Controllers
                 TempData["ErrorMessage"] = $"Error rejecting claim: {ex.Message}";
                 return RedirectToAction("PreApprove");
             }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ApproveClaim(int claimId)
-        {
-            var userRole = GetCurrentUserRole();
-            var result = await _claimService.ApproveClaimWithValidation(claimId, userRole);
-
-            if (result.success)
-            {
-                TempData["SuccessMessage"] = result.message;
-            }
-            else
-            {
-                TempData["ErrorMessage"] = result.message;
-            }
-
-            return RedirectToAction(userRole == "Manager" ? "ApproveClaim" : "PreApprove");
         }
     }
 }

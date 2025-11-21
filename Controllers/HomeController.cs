@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
 
-namespace ContractMonthlyClaimSystem.Controllers
+namespace ContractMontlyClaimSystemPOE.Controllers
 {
     public class HomeController : Controller
     {
